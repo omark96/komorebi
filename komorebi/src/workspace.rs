@@ -784,6 +784,36 @@ impl Workspace {
 
         None
     }
+    pub fn location_from_hwnd(&self, hwnd: isize) -> Option<WorkspaceWindowLocation> {
+        for (container_idx, container) in self.containers().iter().enumerate() {
+            if let Some(window_idx) = container.idx_for_window(hwnd) {
+                return Some(WorkspaceWindowLocation::Container(
+                    container_idx,
+                    window_idx,
+                ));
+            }
+        }
+
+        if let Some(window) = self.maximized_window() {
+            if hwnd == window.hwnd {
+                return Some(WorkspaceWindowLocation::Maximized);
+            }
+        }
+
+        if let Some(container) = self.monocle_container() {
+            if let Some(window_idx) = container.idx_for_window(hwnd) {
+                return Some(WorkspaceWindowLocation::Monocle(window_idx));
+            }
+        }
+
+        for (window_idx, window) in self.floating_windows().iter().enumerate() {
+            if hwnd == window.hwnd {
+                return Some(WorkspaceWindowLocation::Floating(window_idx));
+            }
+        }
+
+        None
+    }
 
     pub fn contains_managed_window(&self, hwnd: isize) -> bool {
         for container in self.containers() {
