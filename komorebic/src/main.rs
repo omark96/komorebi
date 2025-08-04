@@ -1773,6 +1773,8 @@ fn main() -> Result<()> {
 
             if static_config.exists() {
                 println!("{}", static_config.display());
+            } else {
+                println!("Invalid config location: {}", static_config.display());
             }
         }
         SubCommand::BarConfiguration => {
